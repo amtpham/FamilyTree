@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import React from 'react';
-import ReactFlow, { Background, Controls, MiniMap, Node, Edge } from 'reactflow';
+import ReactFlow, { Background, Controls, MiniMap, type Node, type Edge } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Person } from '@/lib/types';
 
@@ -12,7 +12,6 @@ function buildGraph(people: Person[]) {
   const edges: Edge[] = [];
   const idToIndex = new Map<string, number>();
   const columns = Math.ceil(Math.sqrt(people.length || 1));
-
   people.forEach((p, idx) => {
     idToIndex.set(p.id, idx);
     const row = Math.floor(idx / columns);
@@ -24,18 +23,16 @@ function buildGraph(people: Person[]) {
       style: { padding: 8, borderRadius: 8, background: 'white', border: '1px solid #ddd' },
     });
   });
-
   const seen = new Set<string>();
   people.forEach((p) => {
     p.children.forEach((childId) => {
-      const edgeId = `${p.id}-${childId}`;
+      const edgeId = p.id + '-' + childId;
       if (!seen.has(edgeId) && idToIndex.has(p.id) && idToIndex.has(childId)) {
         edges.push({ id: edgeId, source: p.id, target: childId, animated: false });
         seen.add(edgeId);
       }
     });
   });
-
   return { nodes, edges };
 }
 
@@ -47,7 +44,7 @@ export default function FamilyGraph({ people, onSelect }: Props) {
   }, [people, onSelect]);
 
   return (
-    <div style={{ width: '100%', height: 600 }} className="border rounded-md">
+    <div style={{ width: '100%', height: 600 }} className='border rounded-md'>
       <ReactFlow nodes={nodes} edges={edges} onNodeClick={onNodeClick} fitView>
         <Background />
         <MiniMap />
@@ -56,3 +53,4 @@ export default function FamilyGraph({ people, onSelect }: Props) {
     </div>
   );
 }
+
